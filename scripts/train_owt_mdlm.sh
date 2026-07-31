@@ -60,8 +60,8 @@ export HYDRA_FULL_ERROR=1
 RUN_DIR="$REPO_DIR/outputs/owt_scratch"
 
 python -u main.py \
-  loader.batch_size=16 \
-  loader.eval_batch_size=16 \
+  loader.batch_size=8 \
+  loader.eval_batch_size=8 \
   model=small \
   data=openwebtext-split \
   data.cache_dir=/datasets/$USER/mdlm/owt_cache \
