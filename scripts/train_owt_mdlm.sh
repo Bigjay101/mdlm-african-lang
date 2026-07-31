@@ -66,7 +66,7 @@ srun python -u main.py \
   data=openwebtext-split \
   data.cache_dir=/datasets/$USER/mdlm/owt_cache \
   wandb.name=mdlm-owt-scratch \
-  wandb.mode=online \
+  +wandb.offline=true \
   parameterization=subs \
   model.length=1024 \
   eval.compute_generative_perplexity=True \
