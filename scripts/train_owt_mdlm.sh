@@ -72,4 +72,4 @@ srun python -u main.py \
   eval.compute_generative_perplexity=True \
   sampling.steps=1000 \
   hydra.run.dir="$RUN_DIR"
-  # checkpointing.save_dir="$RUN_DIR/checkpoints" \   # uncomment once confirmed via grep above
+  # checkpointing.save_dir="$RUN_DIR/checkpoints" \   # uncomment once confirmed via grep above good stuff
