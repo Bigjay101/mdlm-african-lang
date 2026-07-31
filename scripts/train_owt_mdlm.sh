@@ -2,6 +2,7 @@
 #SBATCH --job-name=mdlm-owt-scratch
 #SBATCH --partition=bigbatch
 #SBATCH --nodes=1
+#SBATCH -w mscluster67
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=32000
@@ -10,6 +11,7 @@
 #SBATCH --open-mode=append
 #SBATCH --output=watch_folder/%x_%j.out
 #SBATCH --error=watch_folder/%x_%j.err
+
 # If `sinfo -o "%P %G %D %N" | grep bigbatch` shows a real Gres string
 # (not "(null)"), uncomment and fill in below:
 # #SBATCH --gres=gpu:<type>:1
