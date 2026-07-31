@@ -59,7 +59,7 @@ export HYDRA_FULL_ERROR=1
 # is not a real config key, Hydra will error on an unknown override.
 RUN_DIR="$REPO_DIR/outputs/owt_scratch"
 
-srun python -u main.py \
+python -u main.py \
   loader.batch_size=16 \
   loader.eval_batch_size=16 \
   model=small \
