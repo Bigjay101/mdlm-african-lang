@@ -20,20 +20,20 @@ set -o pipefail   # so a python failure still aborts even though we pipe to tee
 # --- Repo location ---
 REPO_DIR=/home-mscluster/$USER/mdlm/mdlm-african-lang
 cd "$REPO_DIR"
-mkdir -p watch_folder
+mkdir -p watch_folder_sampling
 
 # --- The checkpoint to sample from ---
 # Point at the .ckpt FILE, not the checkpoints/ directory. Confirm with `ls` first.
 CKPT="$REPO_DIR/outputs/owt_scratch_excl/checkpoints/last.ckpt"
-
+FILENAME = "EvalBestEnglish"
 # --- Dedicated results file (generated text + generative perplexity) ---
-RESULTS="$REPO_DIR/watch_folder/${SLURM_JOB_NAME}_${SLURM_JOB_ID}_results.txt"
+RESULTS="$REPO_DIR/watch_folder_sampling/${FILENAME}.txt"
 
 # --- Caches ---
 # data.cache_dir overrides the authors' hardcoded /share/kuleshov path.
 # HF_HOME holds the GPT-2 model used to score generative perplexity of the samples.
-DATA_CACHE=/gluster/$USER/mdlm_data_cache
-export HF_HOME=/gluster/$USER/hf_home
+DATA_CACHE=/home-mscluster/$USER/mdlm/hf_cache/mdlm_data_cache
+export HF_HOME=/home-mscluster/$USER/mdlm/hf_cache/hf_home
 mkdir -p "$DATA_CACHE" "$HF_HOME"
 
 # --- AIRGAP: sample_eval downloads GPT-2 (for generative perplexity) from HF.
@@ -51,7 +51,7 @@ conda activate mdlm
 
 export HYDRA_FULL_ERROR=1
 
-echo "=== Job ${SLURM_JOB_ID} on $(hostname) $(date) ==="
+
 nvidia-smi
 ls -lh "$CKPT"
 
@@ -66,7 +66,7 @@ python -c "import torch, flash_attn; print('torch', torch.__version__, '| flash_
 # Start small: num_sample_batches=2. Raise it once you're happy with the output.
 python main.py \
   mode=sample_eval \
-  eval.checkpoint_path=/path/to/checkpoint/mdlm.ckpt \
+  eval.checkpoint_path=${CKPT} \
   data=openwebtext-split  \
   model.length=1024  \
   sampling.predictor=ddpm_cache  \
