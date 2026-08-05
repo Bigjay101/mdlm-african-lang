@@ -66,18 +66,14 @@ python -c "import torch, flash_attn; print('torch', torch.__version__, '| flash_
 # Start small: num_sample_batches=2. Raise it once you're happy with the output.
 python main.py \
   mode=sample_eval \
-  eval.checkpoint_path=${CKPT} \
-  data=openwebtext-split \
-  data.cache_dir=${DATA_CACHE} \
-  model=small \
-  parameterization=subs \
-  backbone=dit \
-  model.length=1024 \
-  sampling.predictor=ddpm_cache \
-  sampling.steps=1000 \
+  eval.checkpoint_path=/path/to/checkpoint/mdlm.ckpt \
+  data=openwebtext-split  \
+  model.length=1024  \
+  sampling.predictor=ddpm_cache  \
+  sampling.steps=10000 \
   loader.eval_batch_size=1 \
-  sampling.num_sample_batches=2 \
-  +wandb.offline=true 2>&1 | tee "$RESULTS"
+  sampling.num_sample_batches=1 \
+  backbone=dit
 
 # Pull the generated text + generative perplexity into a summary block.
 # Read into a variable FIRST, then append -- don't grep a file while writing it.
