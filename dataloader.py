@@ -157,6 +157,25 @@ class Text8Tokenizer(transformers.PreTrainedTokenizer):
   def get_vocab(self) -> typing.Dict[str, int]:
     return self._vocab_str_to_int
 
+_REPO_ROOT = os.path.dirname(os.path.abspath(__file__))
+SWAHILI_MANIFEST = os.path.join(
+    _REPO_ROOT,'configs', 'data', 'maneno-yetu', 'splits', 'split_manifest.json')
+SWAHILI_DATA_DIR = os.path.join(
+    _REPO_ROOT,'configs', 'data', 'maneno-yetu', 'data-raw', 'cleaned')
+
+
+def get_swahili_dataset(split_name, manifest_path=SWAHILI_MANIFEST,
+                         data_dir=SWAHILI_DATA_DIR):
+    """split_name: 'train' or 'val', matching split.py's manifest keys."""
+    with open(manifest_path, encoding='utf-8') as f:
+        manifest = json.load(f)
+    filenames = manifest['splits'][split_name]
+    texts = []
+    for fn in filenames:
+        with open(os.path.join(data_dir, fn), encoding='utf-8') as f:
+            texts.append(f.read().strip())
+    return datasets.Dataset.from_dict({'text': texts})
+
 
 def get_lambada_test_dataset():
     url = "https://openaipublic.blob.core.windows.net/gpt-2/data/lambada_test.jsonl"
@@ -353,6 +372,10 @@ def get_dataset(
       split='train[-100000:]',
       cache_dir=cache_dir,
       streaming=streaming)
+  elif dataset_name == 'swahili-train':
+    dataset = get_swahili_dataset('train')
+  elif dataset_name == 'swahili-valid':
+    dataset = get_swahili_dataset('val')
   elif dataset_name == 'scientific_papers_arxiv':
     dataset = datasets.load_dataset(
       'scientific_papers', 'arxiv',
@@ -377,7 +400,8 @@ def get_dataset(
       streaming=streaming)
 
   if dataset_name in ['lambada', 'openwebtext-train',
-                      'openwebtext-valid']:
+                      'openwebtext-valid', 'swahili-train',
+                      'swahili-valid']:
     data = dataset
   else:
     data = dataset[mode]

@@ -1,0 +1,2 @@
+*.txt filter=lfs diff=lfs merge=lfs -text
+sw[[:space:]](1).txt filter=lfs diff=lfs merge=lfs -text

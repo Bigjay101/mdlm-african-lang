@@ -154,6 +154,12 @@ def _ppl_eval(config, logger, tokenizer):
 def _train(config, logger, tokenizer):
   logger.info('Starting Training.')
   wandb_logger = None
+  csv_logger = L.pytorch.loggers.CSVLogger(
+    save_dir=os.getcwd(), name='csv_logs',
+    flush_logs_every_n_steps=100)
+  trainer_loggers = [csv_logger]
+  if wandb_logger is not None:
+    trainer_loggers.insert(0, wandb_logger)
   if config.get('wandb', None) is not None:
     wandb_logger = L.pytorch.loggers.WandbLogger(
       config=omegaconf.OmegaConf.to_object(config),
@@ -185,7 +191,7 @@ def _train(config, logger, tokenizer):
     default_root_dir=os.getcwd(),
     callbacks=callbacks,
     strategy=hydra.utils.instantiate(config.strategy),
-    logger=wandb_logger)
+    logger=trainer_loggers)
   trainer.fit(model, train_ds, valid_ds, ckpt_path=ckpt_path)
 
 
