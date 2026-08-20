@@ -45,6 +45,10 @@ def main():
         files=train_files,
         vocab_size=args.vocab_size,
         special_tokens=["<pad>", "<unk>", "<s>", "</s>"],
+        unk_token="<unk>",          # <-- REQUIRED: sets unk_id on the Unigram model.
+                                     # Listing <unk> in special_tokens is NOT enough;
+                                     # without this, any character unseen during
+                                     # training raises instead of mapping to <unk>.
     )
     # Deliberately NOT setting a post_processor. See module docstring --
     # an auto-wrapping post-processor makes MDLM's own
