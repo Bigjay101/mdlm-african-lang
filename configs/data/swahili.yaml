@@ -1,6 +1,6 @@
 train: swahili-train
 valid: swahili-valid
-tokenizer_name_or_path: /home/jtshi/school/honours/research/mdlm/swahili_results/tokenizer
-cache_dir: /home/jtshi/school/honours/research/mdlm/swahili_results/swahili_cache
+tokenizer_name_or_path: /home-mscluster/jtshibumbu/mdlm/mdlm-african-lang/configs/data/maneno-yetu/tokenizer
+cache_dir: /datasets/jtshibumbu/mdlm/swahili_cache
 wrap: True
 streaming: False
