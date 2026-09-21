@@ -1,2 +1,59 @@
-configs/data/maneno-yetu/sw.txt
-*/sw.txt
+# ── Tokenizers: NEVER commit ──────────────────────────────────────────────
+# Regenerate per-machine from split_manifest.json + train_tokenizer.py.
+# The laptop's transformers v5 writes "tokenizer_class": "TokenizersBackend"
+# and a newer Metaspace serialization that transformers 4.38.2 cannot read,
+# so committing these lets a laptop push break the cluster.
+tokenizer/
+configs/data/maneno-yetu/tokenizer/
+configs/data/maneno-yetu/tokenizer-*/
+**/tokenizer.json
+**/tokenizer_config.json
+**/special_tokens_map.json
+*.model
+*.vocab
+
+# ── Corpus: lives on Kaggle, ~2GB ─────────────────────────────────────────
+configs/data/maneno-yetu/data-raw/
+**/maneno-yetu-corpora-*.txt
+
+# ── Run artifacts ─────────────────────────────────────────────────────────
+outputs/
+watch_folder/
+wandb/
+multirun/
+*.ckpt
+*.pt
+*.pth
+*.dat
+lightning_logs/
+csv_logs/
+curves.png
+
+# ── Credentials: never commit ─────────────────────────────────────────────
+kaggle.json
+.kaggle/
+*.pem
+*.key
+.env
+.env.*
+wandb_api_key*
+
+# ── Python ────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.egg-info/
+.ipynb_checkpoints/
+.pytest_cache/
+venv/
+.venv/
+
+# ── OS / editor ───────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+
+# ── Keep these (small, text, machine-independent) ─────────────────────────
+!configs/data/maneno-yetu/splits/
+!configs/data/maneno-yetu/splits/*
