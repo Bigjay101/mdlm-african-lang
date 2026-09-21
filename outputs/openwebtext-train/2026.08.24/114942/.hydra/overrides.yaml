@@ -1,0 +1,9 @@
+- mode=sample_eval
+- eval.checkpoint_path=/home/jtshi/school/honours/research/mdlm/swahili_results/best.ckpt
+- data=openwebtext-split
+- model.length=1024
+- sampling.predictor=ddpm_cache
+- sampling.steps=10000
+- loader.eval_batch_size=1
+- sampling.num_sample_batches=1
+- backbone=dit
