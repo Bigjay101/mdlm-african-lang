@@ -9,7 +9,7 @@
 #SBATCH --requeue
 #SBATCH --open-mode=append
 #SBATCH --output=watch_folder/%x_%j.out
-#SBATCH --exclude=mscluster46
+#SBATCH --exclude=mscluster[46,48,51,57,74,75]
 #SBATCH --error=watch_folder/%x_%j.err
 # NOTE: --output/--error are relative, so this must be submitted from
 # $REPO_DIR (as the working English run was). sbatch from elsewhere fails
