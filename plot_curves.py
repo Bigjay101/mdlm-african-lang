@@ -14,6 +14,7 @@ Usage:
 import argparse
 import glob
 import os
+import re
 import time
 
 import matplotlib
@@ -34,27 +35,49 @@ METRICS = [
 ]
 
 
-def find_metrics_csv(run_dir):
-    """Locate metrics.csv, preferring the highest version_N directory."""
+def find_metrics_csvs(run_dir):
+    """All metrics.csv files for a run, oldest version first.
+
+    A run that was resumed (e.g. after a timeout) gets a new csv_logs/version_N
+    each time, so the full history is spread across several files.
+    """
     pattern = os.path.join(run_dir, 'csv_logs', 'version_*', 'metrics.csv')
-    matches = sorted(glob.glob(pattern))
+    matches = glob.glob(pattern)
     if not matches:
         # fall back to a recursive search -- layout may differ if the run
         # was launched with a different save_dir
-        matches = sorted(glob.glob(
-            os.path.join(run_dir, '**', 'metrics.csv'), recursive=True))
+        matches = glob.glob(os.path.join(run_dir, '**', 'metrics.csv'), recursive=True)
     if not matches:
         raise FileNotFoundError(
             f'No metrics.csv found under {run_dir}. Has training started, '
             f'and has it reached the first flush (default: 100 steps)?')
-    return matches[-1]
+
+    def version(path):  # numeric sort, so version_10 comes after version_2
+        m = re.search(r'version_(\d+)', path)
+        return int(m.group(1)) if m else -1
+    return sorted(matches, key=version)
 
 
-def load_series(csv_path):
-    """Return {column: (steps, values)} for every metric present."""
-    df = pd.read_csv(csv_path)
-    if 'step' not in df.columns:
-        raise ValueError(f'{csv_path} has no "step" column; got {list(df.columns)}')
+def load_series(csv_paths):
+    """Stitch every version together and return {column: (steps, values)}.
+
+    When a run resumes from a checkpoint, the steps an older version logged
+    after that checkpoint were thrown away, so each version is cut off where
+    the next one starts.
+    """
+    frames = [pd.read_csv(p) for p in csv_paths]
+    for p, f in zip(csv_paths, frames):
+        if 'step' not in f.columns:
+            raise ValueError(f'{p} has no "step" column; got {list(f.columns)}')
+    frames = [f for f in frames if not f.empty]
+    if not frames:
+        raise ValueError('metrics.csv files are empty so far.')
+    kept = []
+    for i, f in enumerate(frames):
+        if i + 1 < len(frames):
+            f = f[f['step'] < frames[i + 1]['step'].min()]
+        kept.append(f)
+    df = pd.concat(kept, ignore_index=True)
 
     series = {}
     for col, label, group in METRICS:
@@ -129,12 +152,14 @@ def summarise(series):
 
 
 def run_once(args):
-    csv_path = find_metrics_csv(args.run_dir)
-    series, df = load_series(csv_path)
+    csv_paths = find_metrics_csvs(args.run_dir)
+    series, df = load_series(csv_paths)
     title = args.title or os.path.basename(os.path.normpath(args.run_dir))
     out_path = args.out or os.path.join(args.run_dir, 'curves.png')
     plot(series, out_path, title)
-    print(f'\nread : {csv_path}  ({len(df)} rows)')
+    print(f'\nread : {len(csv_paths)} file(s), {len(df)} rows')
+    for p in csv_paths:
+        print(f'       {p}')
     print(f'wrote: {out_path}\n')
     summarise(series)
 
